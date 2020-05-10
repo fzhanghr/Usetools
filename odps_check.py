@@ -1,5 +1,9 @@
 # -*- coding:utf-8 -*-
+'''
+1、odps校验脚本
+2、usage：python 脚本 源项目名 目标项目名
 
+'''
 from odps import ODPS
 import os,sys
 
