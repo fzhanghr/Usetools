@@ -1,56 +1,81 @@
 # -*- coding:utf-8 -*-
-'''
-1、odps校验脚本
-2、usage：python 脚本 源项目名 目标项目名
-3、提前安装好pyodps：pip install pyodps
-4、单进程运行
 
-'''
 from odps import ODPS
 import os,sys
 
 
-s = ODPS('ak', 'secrect', '%s'% sys.argv[1],endpoint='http://service.cn.maxcompute.aliyun.com/api')
-d = ODPS('ak', 'secrect', 'waq_std',endpoint='http://service.cn.maxcompute.aliyun.com/api')
+odps = ODPS('AK', 'Secret', 'lantian',endpoint='http://service.cn.maxcompute.aliyun.com/api')
+Dodps = ODPS('AK', 'Secret', 'lantian',endpoint='http://service.cn.maxcompute.aliyun.com/api')
 
-print "#######################################################################"
+class checksum(object):
+    #非分区表校验
+    def isnotPartition(self):
+        with open("%s" % sys.argv[1], 'r') as f:
+            tables = ([x.split() for x in f.readlines()])
+            Scount, Dcount, lins= {}, {},0
+            for table in tables:
+                St, Dt = odps.get_table(table[0]), Dodps.get_table(table[0])
+                with St.open_reader() as reader:
+                    Scount[table[0]] = reader.count
+                with Dt.open_reader() as reader:
+                    Dcount[table[0]] = reader.count
+            for key, value in Scount.items():
+                if key in Dcount.keys() and value in Dcount.values():
+                    print("表%s数据一致,数据行数%s"%(key,value))
+                    lins=lins+1
+                    if len(Dcount)==lins:
+                        print("校验完成！")
+                else:
+                    print('差异表信息如下：{源表名:count,目标表名:count}')
+                    print("\t\t{'%s:%s','%s:%s'}" % (key, value, key, Dcount[key]))
 
-for table in  s.list_tables():
-	t1=s.get_table(table.name)
-	if d.exist_table(table.name):
-		t2=d.get_table(table.name)
-	else:
-		#print "目标表%s不存在,跳过校验"%table.name
-		continue
-	#判断该表是否为分区表
-	if table.schema.partitions:
- 		#print 'Table %s is partitioned.' %table.name
-		for partition in table.partitions:
-			#print partition.name
-			with t1.open_reader(partition='%s' %partition.name) as reader:
-				count1 = reader.count
-				#print "表名：%s\t分区：%s\t数据量：%s" %(table.name,partition.name,count1)
-			if t2.exist_partition(partition.name):
-				with  t2.open_reader(partition='%s' %partition.name) as reader2:
-					count2=reader2.count
-					if count1 != count2:
-						print "分区表%s数据不一致,分区%s 详情见%s_diff.txt"%(table.name,partition.name,table.name)
-						with open (table.name+"_diff.txt",'a+') as f:
-							f.write("表名：%s\t分区：%s\t源端数据量：%s\t目标数据量:%s\n"%(table.name,partition.name,count1,count2))
-						#print "表名：%s\t分区：%s\t源端数据量：%s\t目标数据量:%s" %(table.name,partition.name,count1,count2)
-					else:
-						pass
-			else:
-				pass
-	else:
-		#print 'Table %s is not  partitioned.' % table.name
-		with t1.open_reader() as reader:
-			count1 = reader.count
-		with  t2.open_reader() as reader2:
-			count2=reader2.count
-			if count1 != count2:
-				print "表名：%s\t源端数据量：%s\t目标数据量:%s" %(table.name,count1,count2)
-			else:
-				pass
-			
-		
+    #分区表校验
+    def isPartition(self):
+        with open("%s" % sys.argv[1], 'r') as f:
+            tables = ([x.split() for x in f.readlines()])
+            Scount, Dcount,lins = {}, {},0
+            for table in tables:
+                St, Dt = odps.get_table(table[0]), Dodps.get_table(table[0])
+                with St.open_reader(sys.argv[2]) as reader:
+                    Scount[table[0]] = reader.count
+                with Dt.open_reader(sys.argv[2]) as reader:
+                    Dcount[table[0]] = reader.count
+            for key, value in Scount.items():
+                if key in Dcount.keys() and value in Dcount.values():
+                    print("表%s数据一致,数据行数%s" % (key, value))
+                    lins = lins + 1
+                    if len(Dcount) == lins:
+                        print("校验完成！")
+                else:
+                    print('差异表信息如下：{源表名:count,目标表名:count}')
+                    print("\t\t{'%s:%s','%s:%s'}" % (key, value, key, Dcount[key]))
+
+    def usage(self):
+        print("Usage:")
+        print("\tpython odps_check.py 表信息所在文件名 [partition='']")
+        print('''前提:
+     1、安装PyODPS
+        PyODPS支持Python2.6以上（包括Python3），系统安装pip后，只需运行pip install pyodps，PyODPS的相关依赖便会自动安装。
+     2、分别配置好源和目标的连接信息''')
+
+
+
+if __name__ == '__main__':
+    checksum = checksum()
+    if len(sys.argv)==1:
+        checksum.usage()
+    elif len(sys.argv) == 2 :
+        if os.path.isfile(sys.argv[1]):
+            print("正在执行...")
+            checksum.isnotPartition()
+        else:
+            print("文件 %s 不存在! 该文件包含校验的表名，以换行符分割。"%sys.argv[1])
+    elif len(sys.argv) == 3:
+        if os.path.isfile(sys.argv[1]):
+            print("正在执行...")
+            checksum.isPartition()
+        else:
+            print("文件 %s 不存在! 该文件包含校验的表名，以换行符分割。"%sys.argv[1])
+    else:
+        checksum.usage()
+
