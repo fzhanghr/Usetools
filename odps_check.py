@@ -3,6 +3,7 @@
 1、odps校验脚本
 2、usage：python 脚本 源项目名 目标项目名
 3、提前安装好pyodps：pip install pyodps
+4、单进程运行
 
 '''
 from odps import ODPS
