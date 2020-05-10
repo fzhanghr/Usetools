@@ -11,8 +11,8 @@ import os,sys
 	3、用法：python 脚本.py 源项目名称 目标项目名称
 '''
 
-s = ODPS('LTAIz5oYFoQP3BJi', 'AURiYEhglmG8IINAklgOFZodL0HWGk', '%s'% sys.argv[1],endpoint='http://service.cn.maxcompute.aliyun.com/api')
-d = ODPS('LTAIzUw6gMLapKNf', 'Y14A3T921OrjL0gVaWhuIAwToJ3nWr', '%s'% sys.argv[2],endpoint='http://service.cn.maxcompute.aliyun.com/api')
+s = ODPS('', '', '%s'% sys.argv[1],endpoint='http://service.cn.maxcompute.aliyun.com/api')
+d = ODPS('', '', '%s'% sys.argv[2],endpoint='http://service.cn.maxcompute.aliyun.com/api')
 
 print ("######################################################################")
 
