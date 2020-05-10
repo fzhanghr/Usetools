@@ -10,7 +10,6 @@ import os,sys
 
 s = ODPS('ak', 'secrect', '%s'% sys.argv[1],endpoint='http://service.cn.maxcompute.aliyun.com/api')
 #d = ODPS('ak', 'secrect', 'waq_std',endpoint='http://service.cn.maxcompute.aliyun.com/api')
-d = ODPS('LTAIzUw6gMLapKNf', 'Y14A3T921OrjL0gVaWhuIAwToJ3nWr', '%s'% sys.argv[2],endpoint='http://service.cn.maxcompute.aliyun.com/api')
 
 print "#######################################################################"
 
