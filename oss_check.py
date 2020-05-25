@@ -17,8 +17,8 @@ import time
 
 class OSS_CHECK():
         def __init__(self):
-                self.src_config=".safp_3.3_ossutilconfig"   #源oss配置文件
-                self.dest_config=".safp_3.8_ossutilconfig" #目的oss配置文件
+                self.src_config="{$源oss配置文件}"   
+                self.dest_config="{$目标oss配置文件}"
         def check(self):
                 d_data = os.popen('''./ossutil64 ls oss://%s --config-file=%s|egrep  "^[0-9]{4,5}"|awk -F " " '{if($8!~/\/$/) {print "File:"$8,$7,$5}}'|cut -d "/" -f 4- '''%(sys.argv[2],self.dest_config)).readlines()
                 s_data = os.popen('''./ossutil64 ls oss://%s --config-file=%s|egrep  "^[0-9]{4,5}"|awk -F " " '{if($8!~/\/$/) {print "File:"$8,$7,$5}}'|cut -d "/" -f 4- '''%(sys.argv[1],self.src_config)).readlines()
