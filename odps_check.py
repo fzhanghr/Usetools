@@ -4,8 +4,8 @@ from odps import ODPS
 import os,sys
 
 
-odps = ODPS('AK', 'Secret', 'lantian',endpoint='http://service.cn.maxcompute.aliyun.com/api')
-Dodps = ODPS('AK', 'Secret', 'lantian',endpoint='http://service.cn.maxcompute.aliyun.com/api')
+odps = ODPS('{$ak}', '{$Secret}', 'lantian',endpoint='')
+Dodps = ODPS('{$ak}', '{$Secret}', 'lantian',endpoint='')
 
 class checksum(object):
     #非分区表校验
